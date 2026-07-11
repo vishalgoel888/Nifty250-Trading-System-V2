@@ -15,6 +15,17 @@ SETTINGS_SHEET = "Settings"
 LOG_SHEET = "Logs"
 
 # ==========================
+# Nifty Configuration
+# ==========================
+
+INDEX_NAME = "NIFTY 250"
+
+# आगे Official Download URL यहीं रखा जाएगा
+NIFTY250_URL = ""
+
+REQUEST_TIMEOUT = 30
+
+# ==========================
 # GitHub Secret
 # ==========================
 
