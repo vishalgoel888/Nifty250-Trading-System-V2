@@ -10,6 +10,17 @@ class Nifty250:
 
         print("Downloading Nifty250 Constituents...")
 
+        # अभी Dummy Data
+        # अगले Step में यही Official Download होगा
+        df = self._get_dummy_data()
+
+        # Master Sheet Format
+        df = self._prepare_master(df)
+
+        return df
+
+    def _get_dummy_data(self):
+
         data = [
             ["RELIANCE", "Reliance Industries Ltd"],
             ["TCS", "Tata Consultancy Services Ltd"],
@@ -23,6 +34,20 @@ class Nifty250:
             columns=["Symbol", "Company"]
         )
 
-        print(df)
+        return df
+
+    def _download_official_data(self):
+
+        print("Downloading Official Nifty250 Data...")
+
+        # अगले Step में Official Download Code आएगा
+        pass
+
+    def _prepare_master(self, df):
+
+        df["Industry"] = ""
+        df["Series"] = "EQ"
+        df["ISIN"] = ""
+        df["Active"] = "YES"
 
         return df
