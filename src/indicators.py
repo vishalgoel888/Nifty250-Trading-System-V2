@@ -12,26 +12,26 @@ class Indicators:
 
         result = []
 
-        # प्रत्येक Stock के लिए DMA Calculate करें
+        # Calculate DMA for each stock
         for symbol, group in df.groupby("Symbol"):
 
             group = group.sort_values("Date").copy()
 
-            # 50 DMA
+            # DMA 50
             group["DMA50"] = (
                 group["Close"]
                 .rolling(window=50)
                 .mean()
             )
 
-            # 100 DMA
+            # DMA 100
             group["DMA100"] = (
                 group["Close"]
                 .rolling(window=100)
                 .mean()
             )
 
-            # 200 DMA
+            # DMA 200
             group["DMA200"] = (
                 group["Close"]
                 .rolling(window=200)
@@ -45,8 +45,11 @@ class Indicators:
             ignore_index=True
         )
 
-        # CAR Calculate
+        # Calculate CAR
         final_df = self.calculate_car(final_df)
+
+        # Check CAR Signal
+        final_df = self.check_car_signal(final_df)
 
         return final_df
 
@@ -56,15 +59,14 @@ class Indicators:
 
         result = []
 
-        # प्रत्येक Stock पर CAR Calculate करें
         for symbol, group in df.groupby("Symbol"):
 
             group = group.sort_values("Date").copy()
 
-            # 52 Week High की Row
+            # 52 Week High Row
             high_idx = group["High"].idxmax()
 
-            # High वाली Date से Data
+            # Data from High Date onwards
             car_df = group.loc[high_idx:].copy()
 
             # Cumulative Average
@@ -74,13 +76,49 @@ class Indicators:
                 .mean()
             )
 
-            # Original Data में CAR Column
             group["CAR"] = pd.NA
 
             group.loc[
                 car_df.index,
                 "CAR"
             ] = car_df["CAR"]
+
+            result.append(group)
+
+        final_df = pd.concat(
+            result,
+            ignore_index=True
+        )
+
+        return final_df
+
+    def check_car_signal(self, df):
+
+        print("Checking CAR Signal...")
+
+        result = []
+
+        for symbol, group in df.groupby("Symbol"):
+
+            group = group.sort_values("Date").copy()
+
+            signal = "NEGATIVE"
+
+            car_values = group["CAR"].dropna()
+
+            if len(car_values) >= 10:
+
+                last10 = car_values.tail(10).tolist()
+
+                increasing = all(
+                    last10[i] > last10[i - 1]
+                    for i in range(1, len(last10))
+                )
+
+                if increasing:
+                    signal = "POSITIVE"
+
+            group["CAR_SIGNAL"] = signal
 
             result.append(group)
 
